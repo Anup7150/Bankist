@@ -2,6 +2,9 @@ const modal = document.querySelector('.modal');
 const overlay = document.querySelector('.overlay');
 const btnCloseModal = document.querySelector('.btn--close-modal');
 const btnsOpenModal = document.querySelectorAll('.btn--show-modal');
+const btnScrollTo = document.querySelector('.btn--scroll-to');
+const section1 = document.querySelector('#section--1');
+
 
 // console.log(btnsOpenModal);
 
@@ -26,6 +29,112 @@ document.addEventListener('keydown', function (e) {
   }
 
 });
+
+
+//--------------------------Implementing Smooth Scrolling--------------------------#
+// we need to select the element that we want to scroll to
+// we need to select the button that we want to add the event listener so that when we click on the button then we will scroll to the element
+
+//getBoundingClientRect will return the DOMRect object of the element we pass in the getBoundingClientRect method
+// Rect is basically the relative position of the element to the viewport that we see on the screen
+
+btnScrollTo.addEventListener('click', function (e) {
+  const s1coords = section1.getBoundingClientRect()
+  // console.log(s1coords);
+  // here e.target is the button element
+  // console.log(e.target.getBoundingClientRect());
+
+  // we can get the scroll postion of the element using the scrollX and scrollY properties
+  // scrollX is the horizontal scroll position of the element
+  // scrollY is the vertical scroll position of the element
+  // we can also get the scroll position of the element using the scrollLeft and scrollTop properties
+  // scrollLeft is the horizontal scroll position of the element
+  // scrollTop is the vertical scroll position of the element
+  // console.log('Current scroll (X/Y)', window.pageXOffset, window.pageYOffset);
+  //console.log('height/width viewport', document.documentElement.clientHeight, document.documentElement.clientWidth);
+
+  // scrolling
+  // we can scroll to the element using the scrollTo method
+  // scrollTo method takes two arguments which are the x and y coordinates of the element we want to scroll to
+  // the x and y coordinates are relative to the viewport
+
+  // here we are adding the current scroll position of the element to the x and y coordinates of the element we want to scroll to
+  // window.scrollTo(s1coords.left + window.pageXOffset, s1coords.top + window.pageYOffset);
+
+  // to implement the smooth scrolling we need to pass an object with three properties to the scrollTo method
+  // the first property is the left property which is the horizontal scroll position of the element
+  // the second property is the top property which is the vertical scroll position of the element
+  // the third property is the behavior property which is the behaviour of the scrolling
+  // the behaviour property can be smooth or auto
+  // smooth behaviour will implement the smooth scrolling
+  // auto behaviour will implement the normal scrolling
+
+  // old way of implementing the smooth scrolling by manually calculating the scroll position of the element
+  // window.scrollTo({
+  //   left: s1coords.left + window.pageXOffset,
+  //   top: s1coords.top + window.pageYOffset,
+  //   behavior: 'smooth'
+  // })
+
+  // new way of implementing the scroll position of the element is by using the scrollIntoView method
+  // scrollIntoView method is available on all the elements
+  // scrollIntoView method takes an object as an argument
+  // the object has one property which is the behavior property
+  // the behavior property can be smooth or auto
+  // we implement the scrollIntoView method on the element we want to scroll to
+  section1.scrollIntoView({ behavior: 'smooth' });
+})
+
+//--------------------------Event Delegation: Implementing Page Navigation--------------------------
+
+// page Navigation
+
+// page navigation is the process of navigating to different sections of the page when we click on the links
+// if we want to implement the page navigation to the corresponding section, we need to get the id of the section first
+// here we are getting the nodelist of all the links and then we are adding the event listener to all the links
+// document.querySelectorAll('.nav__link').forEach(function (el) {
+//   el.addEventListener('click', function (e) {
+//     e.preventDefault(); // prevent default behaviour of link
+//     // here we are getting the href attribute of the link so that we can get the id of the element we want to scroll to
+//     const id = this.getAttribute('href');
+//     // we only have id of the element we want to scroll to but we dont have the element itself
+//     // we can get the element using the querySelector method
+//     document.querySelector(id).scrollIntoView({ behavior: 'smooth' });
+//     // id.scrollIntoView({ behavior: 'smooth' });
+
+//   });
+
+// });
+
+// Event delegation
+// event delegation is the process of attaching the event listener to the parent element of the element we want to target
+// we use the event bubbling to implement the event delegation
+
+// 1. Add event listener to common parent element
+// 2. Determine what element originated the event
+
+document.querySelector('.nav__links').addEventListener('click', function (e) {
+  // console.log(e.target);
+
+  // Matching strategy
+  // we need to check if the element we clicked on has the class nav__link
+  // if the element we clicked on has the class nav__link then we will scroll to the corresponding section
+  // we can check if the element we clicked on has the class nav__link using the contains method
+  if (e.target.classList.contains('nav__link')) {
+    // console.log('LINK');
+
+    e.preventDefault(); // prevent default behaviour of link
+    // here we are getting the href attribute of the link so that we can get the id of the element we want to scroll to
+    const id = e.target.getAttribute('href');
+    console.log(id);
+    // we only have id of the element we want to scroll to but we dont have the element itself
+    // we can get the element using the querySelector method
+    document.querySelector(id).scrollIntoView({ behavior: 'smooth' });
+    // id.scrollIntoView({ behavior: 'smooth' });
+
+  };
+});
+
 
 /*
 
@@ -151,62 +260,6 @@ console.log(logo.dataset.versionNumber);
 // logo.classList.contains('c');
 
 
-//--------------------------Implementing Smooth Scrolling--------------------------#
-// we need to select the element that we want to scroll to
-// we need to select the button that we want to add the event listener so that when we click on the button then we will scroll to the element
-const btnScrollTo = document.querySelector('.btn--scroll-to');
-const section1 = document.querySelector('#section--1');
-
-//getBoundingClientRect will return the DOMRect object of the element we pass in the getBoundingClientRect method
-// Rect is basically the relative position of the element to the viewport that we see on the screen
-
-btnScrollTo.addEventListener('click', function (e) {
-  const s1coords = section1.getBoundingClientRect()
-  // console.log(s1coords);
-  // here e.target is the button element
-  // console.log(e.target.getBoundingClientRect());
-
-  // we can get the scroll postion of the element using the scrollX and scrollY properties
-  // scrollX is the horizontal scroll position of the element
-  // scrollY is the vertical scroll position of the element
-  // we can also get the scroll position of the element using the scrollLeft and scrollTop properties
-  // scrollLeft is the horizontal scroll position of the element
-  // scrollTop is the vertical scroll position of the element
-  // console.log('Current scroll (X/Y)', window.pageXOffset, window.pageYOffset);
-  //console.log('height/width viewport', document.documentElement.clientHeight, document.documentElement.clientWidth);
-
-  // scrolling
-  // we can scroll to the element using the scrollTo method
-  // scrollTo method takes two arguments which are the x and y coordinates of the element we want to scroll to
-  // the x and y coordinates are relative to the viewport
-
-  // here we are adding the current scroll position of the element to the x and y coordinates of the element we want to scroll to
-  // window.scrollTo(s1coords.left + window.pageXOffset, s1coords.top + window.pageYOffset);
-
-  // to implement the smooth scrolling we need to pass an object with three properties to the scrollTo method
-  // the first property is the left property which is the horizontal scroll position of the element
-  // the second property is the top property which is the vertical scroll position of the element
-  // the third property is the behavior property which is the behaviour of the scrolling
-  // the behaviour property can be smooth or auto
-  // smooth behaviour will implement the smooth scrolling
-  // auto behaviour will implement the normal scrolling
-
-  // old way of implementing the smooth scrolling by manually calculating the scroll position of the element
-  // window.scrollTo({
-  //   left: s1coords.left + window.pageXOffset,
-  //   top: s1coords.top + window.pageYOffset,
-  //   behavior: 'smooth'
-  // })
-
-  // new way of implementing the scroll position of the element is by using the scrollIntoView method
-  // scrollIntoView method is available on all the elements
-  // scrollIntoView method takes an object as an argument
-  // the object has one property which is the behavior property
-  // the behavior property can be smooth or auto
-  // we implement the scrollIntoView method on the element we want to scroll to
-  section1.scrollIntoView({ behavior: 'smooth' });
-})
-
 //--------------------------Types of Events and Event Handlers--------------------------
 // we can add event handlers to the elements
 // event handlers are the functions that are called when the event is triggered
@@ -242,7 +295,6 @@ setTimeout(() => {
   h1.removeEventListener('mouseenter', alertH1);
 }, 3000);
 
-*/
 
 //--------------------------Event Propagation in Practice--------------------------
 // event propagation is the process of event bubbling and event capturing
@@ -289,3 +341,62 @@ document.querySelector('.nav').addEventListener('click', function (e) {
   // e.currentTarget is the element on which the event handler is attached
   console.log('NAV', e.target, e.currentTarget);
 });
+*/
+
+//--------------------------DOM Traversing--------------------------
+// DOM Traversing is basically the process of walking through the DOM
+// we can select the elements based on the relationship to other elements
+
+// traversing downwards: selecting child elements
+const h1 = document.querySelector('h1');
+// childNodes property will return all the child nodes of the element
+console.log(h1.childNodes);
+// children property will return all the direct child elements of the element
+// it retuns the html collection which is a live collection
+console.log(h1.children);
+// firstElementChild property will return the first child element of the element
+console.log(h1.firstElementChild);
+h1.firstElementChild.style.color = 'white';
+// lastElementChild property will return the last child element of the element
+console.log(h1.lastElementChild);
+h1.lastElementChild.style.color = 'orangered';
+
+// traversing upwards: selecting parent elements
+// parentNode property will return the parent node of the element
+console.log(h1.parentNode);
+console.log(h1.parentElement);
+// if we need to find the parent element that is not the direct parent element then we can use the closest method
+// closest method will return the closest parent element of the element
+// closest method takes the selector as an argument just like the querySelector and querySelectorAll method
+// closest method will return the element itself if the element matches the selector
+console.log(h1.closest('.header'));
+
+// closest method is opposite of querySelector method
+// querySelector method will return the child element no matter how far the child element is
+// closest method will return the parent element no matter how far the parent element is
+
+// we can use the custome variable that is in the css file
+h1.closest('.header').style.background = 'var(--gradient-secondary)';
+
+
+// traversing sideways: selecting sibling elements
+
+// in sideways travesrsing we can only select the direct sibling elements
+// we can use the previousElementSibling property to select the previous sibling element
+console.log(h1.previousElementSibling);
+// we can use the nextElementSibling property to select the next sibling element
+console.log(h1.nextElementSibling);
+
+// but what if we want to access all the sibilings of the element
+// we can do that by using the trick of going back to parent element and then selecting all the child elements of the parent element
+console.log(h1.parentElement.children);
+// the code above will return the html collection which is a live collection but not an array
+// we can convert the html collection to the array using the spread operator
+[...h1.parentElement.children].forEach(function (el) {
+  // we can compare the elememnt as well
+
+  if (el !== h1) {
+    el.style.transform = 'scale(0.5)';
+
+  }
+})
