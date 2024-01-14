@@ -4,6 +4,13 @@ const btnCloseModal = document.querySelector('.btn--close-modal');
 const btnsOpenModal = document.querySelectorAll('.btn--show-modal');
 const btnScrollTo = document.querySelector('.btn--scroll-to');
 const section1 = document.querySelector('#section--1');
+const nav = document.querySelector('.nav');
+
+const tabs = document.querySelectorAll('.operations__tab');
+const tabContainer = document.querySelector('.operations__tab-container');
+const tabsContent = document.querySelectorAll('.operations__content');
+
+
 
 
 // console.log(btnsOpenModal);
@@ -134,6 +141,304 @@ document.querySelector('.nav__links').addEventListener('click', function (e) {
 
   };
 });
+
+//--------------------------Building a Tabbed Component--------------------------
+
+// tabs are the component that we can use to display the content in the form of tabs
+// we can switch between the tabs to display the content of the tabs
+// in the old way we need to create the tabs manually and then we need to add the event listener to all the tabs like in the code below
+// document.querySelectorAll('.operations__tab').forEach(function (el) {
+//   console.log(el);
+// });
+
+// but now we can use the event delegation to add the event listener to the parent element of the tabs
+// we can use the event bubbling to implement the event delegation
+
+
+tabContainer.addEventListener('click', function (e) {
+  // console.log(e.target);
+  // Matching strategy
+  // if we try to  use only e.target then it will not work because e.target will return the element on which the event is triggered
+  // if we click on number it will return the number element
+
+  // so we need to use the closest method to get the closest parent element of the element we clicked on
+  // closest method will return the element itself if the element matches the selector
+  // we need to remember that the whenever we use the event delegation we need to use the closest method to get the element we want to target
+
+  // here even if we click on the number it will return the tab element because the closest method will return the element itself if the element matches the selector
+  const clicked = e.target.closest('.operations__tab');
+  // if we click on container instead of the tab then it will return null because the container element does not match the selector
+  // now since we have the tab whenever we click now we can do the things that we want to do
+  // since whenever we click on the tab we have the class call operations__tab--active on the tab
+
+  // console.log(clicked);
+
+  // we need to ignore any click that is not on the tab and we can do that by using the guard clause
+  // guard clause
+  // we ignore any click whose result is null
+  // if there is no click then return immediately and it will finish this function execution
+  // in the code below when there is no click then it will return the null which is falsy value
+  // when we do !clicked it will be true and then it will return immediately and it will finish this function execution
+  // and none of the code below will be executed
+  if (!clicked) return;
+
+  // remove active classes
+  // we need to remove the active class from all the tabs
+  tabs.forEach(t => t.classList.remove('operations__tab--active'));
+  clicked.classList.add('operations__tab--active');
+
+  // activate content area
+  // first we need to select the content like which content for which tab
+  // we can do that by using the dataset property
+  // dataset is the object that contains all the data attributes of the element
+
+  // in this function we have stored the clicked tab in the clicked variable
+  // here the tab value is coming from the dataset object of the clicked tab
+  // first we need to remove the active class from all the content areas
+  tabsContent.forEach(c => c.classList.remove('operations__content--active'));
+  document.querySelector(`.operations__content--${clicked.dataset.tab}`).classList.add('operations__content--active');
+
+});
+
+//--------------------------Passing Arguments to Event Handlers--------------------------
+// // we can pass the arguments to the event handlers
+// // we are trying to implement the hover effect on the nav links
+// // we can do that by using the mouseover and mouseout events because they uses the event bubbling
+// // mouseenter and mouseleave events uses the event capturing
+
+// // here since the mouseroever and mouseout event using similar kind of code we will do the code refactoring
+// // we generally do the code refactoring by creating the function
+// // while refactoring we need to remember that we will need to pass the event and opacity value to the function because
+// // opacity value is different for the mouseover and mouseout events
+// // here we are creating the function called handleHover
+// const handleHover = function (e, opacity) {
+//   // here the this keyword is the opacity value that we passed in the function
+//   // this keyword is same as the e.currentTarget, e.currentTarget is the element on which the event handler is attached
+//   // when we set the this keyword manually then it will become the same as we set it
+//   // console.log(this, e.currentTarget)
+//   // console.log(e.target);
+//   // Matching strategy
+//   // it will only work if the e.target element has the class nav__link
+//   if (e.target.classList.contains('nav__link')) {
+//     // now when the class is found then we need to select the element that we want to apply the hover effect or
+//     // we can say we need to find the sibling element of the element we hover on and we can do that by using the closest method
+//     // wherever the event delegation is used we need to use the closest method to get the element we want to target
+//     // we are storing the element we want to target in link variable
+//     const link = e.target;
+//     // now we need to find the sibling element based on the link variable
+//     // we can do that by going up to the parent element and then selecting the sibling element
+//     // we can use the .nav or .nav__links class to go up to the parent element
+//     const siblings = link.closest('.nav').querySelectorAll('.nav__link')
+//     // we also need to select the logo element
+//     const logo = link.closest('.nav').querySelector('img');
+//     // till here we are done with the sselecting the sibling elements we want to target
+//     // now we need to apply the hover effect on the sibling elements which is basically the opacity change
+//     // we can do that by using the forEach method
+//     siblings.forEach(el => {
+//       // here we will aplly the effect to all the sibling elements leaving the element we hover on
+//       // which is if the current link is not equal to the current element
+//       if (el !== link) el.style.opacity = this; // here this keyword is the opacity value that we passed in the function
+//       logo.style.opacity = this;
+//     })
+//   }
+// }
+
+// // // when we call the handleHover function we need to call it inside the event handler
+// // nav.addEventListener('mouseover', function (e) {
+// //   // here we are calling the handleHover function
+// //   // here the event e  in handleHover function will be the same event e as the current event
+// //   handleHover(e, 0.5);
+
+// //   // // console.log(e.target);
+// //   // // Matching strategy
+// //   // // it will only work if the e.target element has the class nav__link
+// //   // if (e.target.classList.contains('nav__link')) {
+// //   //   // now when the class is found then we need to select the element that we want to apply the hover effect or
+// //   //   // we can say we need to find the sibling element of the element we hover on and we can do that by using the closest method
+// //   //   // wherever the event delegation is used we need to use the closest method to get the element we want to target
+// //   //   // we are storing the element we want to target in link variable
+// //   //   const link = e.target;
+// //   //   // now we need to find the sibling element based on the link variable
+// //   //   // we can do that by going up to the parent element and then selecting the sibling element
+// //   //   // we can use the .nav or .nav__links class to go up to the parent element
+// //   //   const siblings = link.closest('.nav').querySelectorAll('.nav__link')
+// //   //   // we also need to select the logo element
+// //   //   const logo = link.closest('.nav').querySelector('img');
+// //   //   // till here we are done with the sselecting the sibling elements we want to target
+// //   //   // now we need to apply the hover effect on the sibling elements which is basically the opacity change
+// //   //   // we can do that by using the forEach method
+// //   //   siblings.forEach(el => {
+// //   //     // here we will aplly the effect to all the sibling elements leaving the element we hover on
+// //   //     // which is if the current link is not equal to the current element
+// //   //     if (el !== link) el.style.opacity = 0.5;
+// //   //     logo.style.opacity = 0.5;
+// //   //   })
+// //   // }
+// // });
+
+// // in the code below we are using the bind method to pass the opacity value to the handleHover function
+// // bind method will return the new function with the this keyword set to the value we pass in the bind method
+// nav.addEventListener('mouseover', handleHover.bind(0.5));
+
+// nav.addEventListener('mouseout', handleHover.bind(1));
+// // we also need the mouseout event to remove the hover effect
+// // nav.addEventListener('mouseout', function (e) {
+
+// //   handleHover(e, 1);
+// //   // if (e.target.classList.contains('nav__link')) {
+// //   //   const link = e.target;
+// //   //   const siblings = link.closest('.nav').querySelectorAll('.nav__link')
+// //   //   const logo = link.closest('.nav').querySelector('img');
+// //   //   siblings.forEach(el => {
+// //   //     if (el !== link) el.style.opacity = 1;
+
+// //   //     logo.style.opacity = 1;
+// //   //   })
+// //   // }
+
+// // });
+
+// //--------------------------Sticky Navigation: The Scroll Event--------------------------
+
+// // sticky navigation is the navigation that is fixed to the top of the page when we scroll down or the navigation bar
+// // beccomes attached to the top of the page when we scroll to a certain position
+
+// // scroll event
+// // scroll event is the event that is triggered when we scroll the page
+// // scroll event is the event that is triggered on the window object but not on the document object
+// // scroll event is triggered every time we scroll the page
+// // now to add the sticky class to the nav element we need to find a logic that will add the sticky class to the nav element when we scroll to a certain position
+// // here we are using the getBoundingClientRect method to get the position of the section1 element which will return the DOMRect object
+// const initialCoords = section1.getBoundingClientRect();
+// // console.log(initialCoords);
+// window.addEventListener('scroll', function () {
+//   // scrolllY is the vertical scroll position of the page that start from every top of the page
+//   // console.log(window.scrollY);
+//   if (this.window.scrollY > initialCoords.top) nav.classList.add('sticky');
+//   else nav.classList.remove('sticky');
+// })
+
+//--------------------------A Better Way: The Intersection Observer API--------------------------
+// we can use the intersection observer API to implement the sticky navigation
+//this API allows our code to observe changes to the way a certain target element intersects another element or the way it intersects the viewport
+// we need to create the observer first by using the IntersectionObserver constructor
+
+// the obsCallback function will be called each time the observed element is intersecting the root element at the threshold we defined
+// takes two arguments which are the entries and observer
+// entries is the array of the threshold entries
+// const obsCallback = function (entries, observer) {
+//   console.log(entries);
+
+// };
+// const obsOptions = {
+//   root: null, // null means the viewport
+//   threshold: [0, 0.2] // 10% of the section1 element is visible in the viewport
+// };
+// // the constructor takes the callback function and object of options as an argument
+// const observer = new IntersectionObserver(obsCallback, obsOptions);
+// // here the section1 is the target element and we use the observe method to observe the target element
+// observer.observe(section1);
+
+const header = document.querySelector('.header');
+// in the code below we will use getBoundingClientRect method to get the height of the nav element
+const navHeight = nav.getBoundingClientRect().height;
+// console.log(navHeight);
+
+const steakyNav = function (entries) {
+  // here the entries is the array of the threshold entries
+  const [entry] = entries; // here we are using the destructuring to get the first element of the array
+  // console.log(entry);
+  // in the code below we are using the isIntersecting property to check if the element is intersecting the root element
+  // if the element is not intersecting the root element then we will add the sticky class to the nav element
+  if (!entry.isIntersecting) nav.classList.add('sticky');
+  else nav.classList.remove('sticky');
+}
+
+const headerObserver = new IntersectionObserver(steakyNav, {
+  root: null,
+  threshold: 0, // as soon as the header element is out of the viewport then the callback function will be called
+  rootMargin: `-${navHeight}px`, // rootMargin is the margin that we will be applied to the nav element outside or inside, it only accpets px
+});
+headerObserver.observe(header);
+
+//--------------------------Revealing Elements on Scroll--------------------------
+// revealing elementss on scroll is the process of revealing the elements when we scroll close to the element
+// we can use the intersection observer API to implement the revealing elements on scroll
+
+const allSections = document.querySelectorAll('.section');
+
+
+// now we need to reveal the section elements when we scroll close to the section element
+
+// lets create the callback function here
+const revealSection = function (entries, observer) {
+  // here the entries is the array of the threshold entries
+  // that means if we have multiple threshold entries then we will have multiple entries, here the sections are the threshold entries
+  const [entry] = entries; // here we are using the destructuring to get the first element of the array
+  // console.log(entry);
+  // using the guard clause
+  if (!entry.isIntersecting) return;
+  entry.target.classList.remove('section--hidden');
+  // we need to unobserve the section element after the section element is revealed
+  // we can do that by using the unobserve method
+  // we need to unobserve the section element because we dont want to observe the section element after the section element is revealed
+  // if we dont unobserve the section element then the callback function will be called every time we scroll the page
+  observer.unobserve(entry.target);
+}
+
+// first we need to  create the observer
+const sectionObserver = new IntersectionObserver(revealSection, {
+  root: null, // null means the viewport
+  threshold: 0.15 // 15% of the section is visible in the viewport
+})
+
+allSections.forEach(function (section) {
+  // lets hide the section elements first
+  section.classList.add('section--hidden');
+  // lets add the observer to the section elements
+  // we are saying hey observer observe the section element
+  sectionObserver.observe(section);
+});
+
+//--------------------------Lazy Loading Images--------------------------
+// lazy loading images is the process of loading the images only when we scroll close to the image
+// we can use the intersection observer API to implement the lazy loading images
+// first we need to select the images we want to lazy load and we can do that by using the data-src attribute
+const imgTargets = document.querySelectorAll('img[data-src]');
+
+// lets create the callback function here
+const loadImg = function (entries, observer) {
+  const [entry] = entries;
+  console.log(entry);
+  // using the guard clause
+  if (!entry.isIntersecting) return;
+  // the main logic is to replace the src attribute with the data-src attribute
+  entry.target.src = entry.target.dataset.src;
+  // loading the images happens behind the scenes and as soon as the image is loaded it will ommit the load event
+  // we can listen to the load event on the image element
+  // we can do that by using the addEventListener method
+  entry.target.addEventListener('load', function () {
+    // only after when the image is fully loaded behind the scene we need to remove the blur class from the image element
+    entry.target.classList.remove('lazy-img');
+
+  });
+
+  // we need to unobserve the image element after the image element is loaded
+  // we can do that by using the unobserve method
+  imgObserver.unobserve(entry.target);
+
+}
+// we will create the intersection observer for the images
+const imgObserver = new IntersectionObserver(loadImg, {
+  root: null,
+  threshold: 0,
+})
+
+// we will add the observer to each of the image
+imgTargets.forEach(img => imgObserver.observe(img));
+
+
+
 
 
 /*
@@ -308,7 +613,7 @@ setTimeout(() => {
 // the code below will create the random number between min and max
 const randomInt = (min, max) => Math.floor(Math.random() * (max - min + 1) + min);
 //console.log(randomInt(0, 255));
-const randomColor = () => `rgba(${randomInt(0, 255)},${randomInt(0, 255)},${randomInt(0, 255)})`;
+const randomColor = () => `rgba(${ randomInt(0, 255) }, ${ randomInt(0, 255) }, ${ randomInt(0, 255) })`;
 console.log(randomColor());
 
 // adding event handlers to the specific elements
@@ -341,7 +646,6 @@ document.querySelector('.nav').addEventListener('click', function (e) {
   // e.currentTarget is the element on which the event handler is attached
   console.log('NAV', e.target, e.currentTarget);
 });
-*/
 
 //--------------------------DOM Traversing--------------------------
 // DOM Traversing is basically the process of walking through the DOM
@@ -394,9 +698,9 @@ console.log(h1.parentElement.children);
 // we can convert the html collection to the array using the spread operator
 [...h1.parentElement.children].forEach(function (el) {
   // we can compare the elememnt as well
-
   if (el !== h1) {
     el.style.transform = 'scale(0.5)';
 
   }
 })
+*/
