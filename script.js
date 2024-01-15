@@ -409,7 +409,7 @@ const imgTargets = document.querySelectorAll('img[data-src]');
 // lets create the callback function here
 const loadImg = function (entries, observer) {
   const [entry] = entries;
-  console.log(entry);
+  // console.log(entry);
   // using the guard clause
   if (!entry.isIntersecting) return;
   // the main logic is to replace the src attribute with the data-src attribute
@@ -438,9 +438,165 @@ const imgObserver = new IntersectionObserver(loadImg, {
 imgTargets.forEach(img => imgObserver.observe(img));
 
 
+//--------------------------Building a Slider Component: part- 1 --------------------------
+// slider is the component that we can use to display the content in the form of slides
+// we can switch between the slides to display the content of the slides
+// in the old way we need to create the slides manually and then we need to add the event listener to all the slides like in the code below
+
+// lets put all the slider code inside one single function
+const sliderFunction = function () {
+  // we need to select the slides
+  const slides = document.querySelectorAll('.slide');
+  const slider = document.querySelector('.slider');
+  // we need to select the buttons
+  const btnLeft = document.querySelector('.slider__btn--left');
+  const btnRight = document.querySelector('.slider__btn--right');
+  // we need to select the dots
+  const dotContainer = document.querySelector('.dots');
+
+  // making the slides a bit smaller and moving a bit to the left
+  // slider.style.transform = 'scale(0.4) translateX(-800px)';
+  // slider.style.overflow = 'visible';
+
+  // we defined the variaable as let because we will update the value of the variable
+  let curSlide = 0;
+  // we can also tell js not to excute further right or left move when the slide ends
+  const maxSlide = slides.length - 1;
+
+  // we need to create the dots for the slides
+  // we can do that by using the forEach method
+  // we need to create the html for the dots inside the dots element
+  // we can do that by using the insertAdjacentHTML method
+
+  const createDots = function () {
+    slides.forEach(function (_, i) {
+      // we need to pass the value of index to the data-slide attribute of the button
+      dotContainer.insertAdjacentHTML('beforeend', ` <button class="dots__dot dots__dot--active" data-slide="${i}"></button>`);
+    });
+  };
+
+  // we need to call the createDots function so that the dots will be created when the page loads with the slides
 
 
+  // now lets create a function for the active dot
+  const activateDot = function (slide) {
+    // first remove the active class from all the dots and for that we need to select all the dots
+    document.querySelectorAll('.dots__dot').forEach(dot => dot.classList.remove('dots__dot--active'));
+    // secoondly we need to select the dot that we want to have the active class and for that we need to select the dot based on the slide
+    // we can do that selecting the dot from dots__dot class based on the slide value and add the active class to it
+    document.querySelector(`.dots__dot[data-slide ="${slide}"]`).classList.add('dots__dot--active');
+  }
 
+  // now need to show each slide on side by side first and we can do that by using the forEach method
+  // we will the index in here because we need to set the transform property of each slide
+  // the code below is the main logic of the slider which is giving 0% to the first slide, 100% to the second slide and 200% to the third slide
+  // slides.forEach((s, i) => s.style.transform = `translateX(${100 * i}%)`);
+  const gotoSlide = function (slide) {
+    slides.forEach((s, i) => s.style.transform = `translateX(${100 * (i - slide)}%)`);
+  }
+  // the code below will start the slider from the first slide
+
+  const nextSlide = function () {
+    if (curSlide === maxSlide) {
+      curSlide = 0;
+
+    }
+    else {
+      curSlide++;
+    }
+    gotoSlide(curSlide);
+    activateDot(curSlide);
+  }
+
+  const prevSlide = function () {
+    if (curSlide === 0) {
+      curSlide = maxSlide;
+    }
+    else {
+      curSlide--;
+    }
+    gotoSlide(curSlide);
+    activateDot(curSlide);
+  }
+
+  // lets create the init function that will be initialized when the page loads
+  const init = function () {
+    gotoSlide(0);
+    createDots();
+    activateDot(0);
+  }
+
+  init();
+
+  // event handlers
+  // now we will use the same logic but a bit of changess to implement the slider when clicking on the buttons
+  btnRight.addEventListener('click', nextSlide)//{
+  // now we need to find a way to move the slide on left when we click on the right button
+  // we can create a variable called currentSlide and set it to 0, which is the first slide
+  // we can increment the currentSlide variable by 1 when we click on the right button
+  // curSlide++;
+  // now we will do a bit of twist that is we will subtract the currentSlide from the index of the slide
+  // so that whenever we click the button the slide will move to the left because the translateX value will be negative
+  // now when the curslide reaches the maxslide then we need to stop the slider and reassign the currentSlide to 0
+  // if (curSlide === maxSlide) {
+  //   curSlide = 0;
+
+  // }
+  // else {
+  //   curSlide++;
+  // }
+  // gotoSlide(curSlide);
+
+  // })
+
+  btnLeft.addEventListener('click', prevSlide) //{
+  //   // its similar for the btnLeft button but we need to decrement the currentSlide variable by 1 because we are moving to the right
+  //   if (curSlide > 0) {
+  //     slides.forEach((s, i) => s.style.transform = `translateX(${100 * (i - curSlide)}%)`);
+  //   }
+
+
+  // });
+
+
+  // now lets do the slide with the keyboard keys
+  // need to add the event listener with event type keydown, keydown event is triggered when we press the key
+  // we can add the event listener to the document object
+  document.addEventListener('keydown', function (e) {
+    // with the console we can fighure out which key is pressed
+    console.log(e);
+    // now we need to check if the key pressed is the left arrow key
+    // we can do that by using the key property of the event object
+    if (e.key === 'ArrowLeft') prevSlide();
+    // now we need to check if the key pressed is the right arrow key
+    // we can do that by using the key property of the event object
+    if (e.key === 'ArrowRight') nextSlide();
+  });
+
+  // now since the dots are created dynamically we need to add the event listener to the dots
+  // we can do that by using the event delegation
+  // we can add the event listener to the dotContainer element
+  // we need to add the event listener to the dotContainer element because the dotContainer element is the parent element of the dots
+  // we can use the event bubbling to implement the event delegation
+  dotContainer.addEventListener('click', function (e) {
+    // console.log(e.target);
+    // matching strategy
+    if (e.target.classList.contains('dots__dot')) {
+      // we need to get the value of the data-slide attribute of the button
+      // whenever a custom attribute is created it is storedd in the dataset object of the element
+      // we can do that by using the dataset property
+      // dataset is the object that contains all the data attributes of the element
+      // now store the value of the data-slide attribute of the button in the slideTo variable
+      // const slideTo = e.target.dataset.slide;
+      // we can use destructuring to get the value of the data-slide attribute of the button
+      const { slide } = e.target.dataset;
+      gotoSlide(slide);
+      activateDot(slide);
+    }
+  })
+};
+
+sliderFunction();
 /*
 
 //--------------------------Selecting, Creating and Deleting Elements--------------------------
@@ -704,3 +860,49 @@ console.log(h1.parentElement.children);
   }
 })
 */
+
+//--------------------------Lifecycle DOM Events--------------------------
+// different eveents that occur in the DOM during webpage lifecycle(the moment the webpage is created to the moment the webpage is closed)
+
+// 1. DOMContentLoaded event
+// DOMContentLoaded event is the event that is triggered when the initial HTML document has been completely loaded and parsed
+// DOMContentLoaded event is the event that is triggered on the document object
+// DOMContentLoaded event is the event that is triggered when the DOM is ready
+// DOMContentLoaded event doesnot wait for the images and other external resources to load
+
+document.addEventListener('DOMContentLoaded', function (e) {
+  console.log('HTML parsed and DOM tree built!', e);
+});
+
+// 2. load event
+// load event is the event that is triggered when the page is fully loaded including all the external resources like images, videos etc
+// load event is the event that is triggered on the window object
+// load event is the event that is triggered when the page is ready
+// load event waits for the images and other external resources to load
+
+window.addEventListener('load', function (e) {
+  console.log('Page fully loaded', e);
+});
+
+// 3. beforeunload event
+// beforeunload event is the event that is triggered when the user tries to leave the page
+// beforeunload event is the event that is triggered on the window object
+// beforeunload event is the event that is triggered when the user tries to close the page
+// beforeunload event is the event that is triggered when the user tries to reload the page
+// beforeunload event is the event that is triggered when the user tries to go to another page
+// beforeunload event is the event that is triggered when the user tries to close the browser
+// beforeunload event is the event that is triggered when the user tries to go to another tab
+// beforeunload event is the event that is triggered when the user tries to refresh the page
+// beforeunload event is the event that is triggered when the user tries to go to another website
+// beforeunload event is the event that is triggered when the user tries to go to another domain
+// beforeunload event is the event that is triggered when the user tries to go to another protocol
+// beforeunload event is the event that is triggered when the user tries to go to another port
+// beforeunload event is the event that is triggered when the user tries to go to another subdomain
+
+// it will give us a popup with generic message
+// window.addEventListener('beforeunload', function (e) {
+//   e.preventDefault();
+//   console.log(e);
+//to display a leaving confirmation, we need to to set return value on the event to an empty string
+//   e.returnValue = '';
+// });
